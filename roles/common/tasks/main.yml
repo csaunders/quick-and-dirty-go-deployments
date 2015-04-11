@@ -1,0 +1,9 @@
+---
+- apt: upgrade_cache=yes
+- apt: upgrade=full
+
+- name: Install Services
+  apt: name={{ item }} state=present
+  with_items:
+    - nginx
+    - monit

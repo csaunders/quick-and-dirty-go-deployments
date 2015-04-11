@@ -1,0 +1,71 @@
+#! /bin/sh
+# Most of this taken from etc_init.d_znc
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+NAME={{ appname }}
+DESC="Goapp daemon"
+PIDDIR=/var/run/{{ appname }}
+PIDFILE=$PIDDIR/$NAME.pid
+DATADIR=/var/lib/{{ appname }}
+DAEMON_ARGS=""
+DAEMON=/opt/go-src/bin/$NAME
+USER={{ appname }}
+GROUP={{ appname }}
+
+# Load the VERBOSE setting and other rcS variables
+. /lib/init/vars.sh
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.2-14) to ensure that this file is present
+# and status_of_proc is working.
+. /lib/lsb/init-functions
+
+do_start()
+{
+  if [ ! -d $PIDDIR ]
+  then
+    mkdir $PIDDIR
+  fi
+  chown $USER:$GROUP $PIDDIR
+  start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --test --chuid $USER > /dev/null || return 1
+  start-stop-daemon --start --quiet --pidfile $PIDFILE --background --exec $DAEMON --chuid $USER -- $DAEMON_ARGS > /dev/null || return 2
+}
+
+do_stop()
+{
+  start-stop-daemon --stop --quiet --retry=0/30/KILL/5 --pidfile $PIDFILE --name $NAME --chuid $USER
+  RETVAL="$?"
+  [ "$RETVAL" = 2 ] && return 2
+
+  start-stop-daemon --stop --quiet --oknodo --retry=0/30/KILL/5 --exec $DAEMON --chuid $USER
+  [ "$RETVAL" = 2 ] && return 2
+
+  rm -f $PIDFILE
+  return "$RETVAL"
+}
+
+case "$1" in
+  start)
+  [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+  do_start
+  case "$?" in
+    0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+    2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+  esac
+  ;;
+  stop)
+  [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+  do_stop
+  case "$?" in
+    0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+    2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+  esac
+  ;;
+  restart)
+  do_stop
+  do_start
+  ;;
+  *)
+  echo "Usage: {{ appname }} {start|stop|restart}"
+  exit 3
+  ;;
+esac

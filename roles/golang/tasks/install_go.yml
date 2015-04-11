@@ -1,0 +1,15 @@
+---
+- name: Download Go for Linux
+  get_url: url=https://storage.googleapis.com/golang/go{{ gover }}.linux-amd64.tar.gz dest=/tmp/go{{ gover }}.linux-amd64.tar.gz
+
+- name: Breaking Go symlink
+  file: path=/usr/local/go state=absent
+
+- name: Extract Archive
+  command: /bin/tar -C /usr/local -zxf /tmp/go{{ gover }}.linux-amd64.tar.gz
+
+- name: Rename Go Installation
+  command: mv /usr/local/go /usr/local/go-{{ gover }}
+
+- name: Setup Symlink to newly installed version of Go
+  file: src=/usr/local/go-{{ gover }} dest=/usr/local/go state=link

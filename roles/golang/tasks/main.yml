@@ -1,0 +1,7 @@
+---
+- name: Check to see if specific Go version is installed
+  stat: path=/usr/local/go-{{ gover }}
+  register: go_installed
+
+- include: install_go.yml
+  when: not go_istalled.stat.exists

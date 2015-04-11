@@ -1,0 +1,9 @@
+---
+- hosts: appserver
+  user: root
+  vars:
+    appname: yourproj
+    appsrc: github.com/yourname/yourproj
+
+  roles:
+    - role: goapp

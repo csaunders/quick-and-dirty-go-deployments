@@ -1,0 +1,14 @@
+---
+- hosts: appserver
+  user: root
+  vars:
+    gover: 1.4.2
+    appname: yourproj
+    appport: 8000
+    appsrc: github.com/yourname/yourproj
+
+  roles:
+    - role: common
+    - role: golang
+    - role: goapp-deps
+    - role: goapp

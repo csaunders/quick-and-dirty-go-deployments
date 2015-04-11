@@ -1,0 +1,4 @@
+check process {{ appname }} with pidfile /var/run/{{ appname }}/{{ appname }}.pid
+  group goapp
+  start program="/etc/init.d/{{ appname }} start"
+  stop program="/etc/init.d/{{ appname }} stop"

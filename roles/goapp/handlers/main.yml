@@ -1,0 +1,2 @@
+- name: goapp restart
+  service: name={{ appname }} state=restarted

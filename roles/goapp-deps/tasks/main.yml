@@ -1,0 +1,20 @@
+---
+- name: Create goapp group
+  group: name=goapp state=present
+
+- name: Create goapp user
+  user: name=goapp state=present home=/var/lib/goapp group=goapp shell=/usr/sbin/nologin
+
+- name: Create goapp nginx configuration
+  template: src=goapp.conf.j2 dest=/etc/nginx/sites-available/{{ appname }}.conf
+
+- name: Enable goapp site
+  file: src=/etc/nginx/sites-available/{{ appname }}.conf dest=/etc/nginx/sites-enabled/{{ appname }}.conf
+  notify: restart nginx
+
+- name: Install Init Script
+  template: src=etc_init.d_goapp dest=/etc/init.d/{{ appname }} mode=0755
+
+- name: Update Monit Configuration
+  template: src=etc_monit_conf.d_goapp.j2 dest=/etc/monit/config.d/{{ appname }}
+  notify: restart monit
